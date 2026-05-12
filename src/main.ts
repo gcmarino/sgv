@@ -1,5 +1,9 @@
 import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
+
+(BigInt.prototype as any).toJSON = function () {
+  return this.toString();
+};
 import { AppModule } from './app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 

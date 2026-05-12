@@ -8,7 +8,11 @@ export class AppController {
 
   @Get()
   async getHello() {
-    const order = await this.prisma.orders.findFirst();
+    const order = await this.prisma.orders.findFirst({
+      include: {
+        OrderItems: true
+      }
+    });
     return order;
   }
 }

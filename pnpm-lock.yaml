@@ -32,6 +32,9 @@ importers:
       amqplib:
         specifier: ^2.0.1
         version: 2.0.1
+      dotenv:
+        specifier: ^17.4.2
+        version: 17.4.2
       mssql:
         specifier: ^12.5.2
         version: 12.5.2(@azure/core-client@1.10.1)
