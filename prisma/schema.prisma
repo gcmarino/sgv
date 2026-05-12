@@ -1470,7 +1470,7 @@ model ShopperAssignments {
 }
 
 model ShopperAvailabilities {
-  Id        BigInt                   @id(map: "PK_ShopperAvailabilities") @default(autoincrement())
+  Id        BigInt                   @id(map: "PK_ShopperAvailabilities") @default(autoincrement()) @unique
   ShopperId Int
   Type      Int
   CreatedAt DateTime                 @db.DateTimeOffset
@@ -1491,7 +1491,7 @@ model ShopperRatings {
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model OrderManagement_Shoppers {
-  Id                               Int
+  Id                               Int @id
   MaxNumberOfAssignmentsInParallel Int
   IsAvailable                      Boolean
   SearchByTrackingIdIsEnabled      Boolean
@@ -1504,7 +1504,7 @@ model OrderManagement_Shoppers {
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model dbo_Shoppers {
-  Id            Int
+  Id            Int @id
   Status        Int
   IsEnabled     Boolean
   ShopperStores ShopperStores[]
