@@ -1,17 +1,16 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { OrdersService } from './orders.service';
-import { EventPattern, Payload } from '@nestjs/microservices';
+import { DateRangeDto } from './dto/date-range.dto';
 
-@Controller()
-export class OrdersController  {
+@Controller('orders')
+export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
-  @EventPattern("insert_sale")
-  async insertSale(@Payload() sale: any) {
-    console.log("[OrdersController] Received sale:", sale);
-    // Here you would typically call a method on the ordersService to handle the sale
-    // For example: await this.ordersService.insertSale(sale);
+  @Get()
+  getByDateRange(@Query() query: DateRangeDto) {
+    return this.ordersService.findByDateRange(
+      query.startDateAsDate,
+      query.endDateAsDate,
+    );
   }
-
-
 }

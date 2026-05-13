@@ -9,15 +9,6 @@ export class AppController {
     @Inject('RABBITMQ_CLIENT') private readonly rmqClient: ClientProxy,
   ) {}
 
-  @Get()
-  async getHello() {
-    const order = await this.prisma.orders.findFirst({
-      include: {
-        OrderItems: true,
-      },
-    });
-    return order;
-  }
 
   @Post('insert-sale')
   insertSale(@Body() payload: Record<string, unknown> = {}) {

@@ -1,5 +1,6 @@
-import 'dotenv/config';
+import { env } from './config/env';
 import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
 
 (BigInt.prototype as any).toJSON = function () {
   return this.toString();
@@ -9,12 +10,13 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
-      urls: [process.env.RABBITMQ_URL!],
-      queue: process.env.RABBITMQ_QUEUE!,
+      urls: [env.RABBITMQ_URL],
+      queue: env.RABBITMQ_QUEUE,
       queueOptions: {
         durable: true
       }
@@ -22,6 +24,6 @@ async function bootstrap() {
   });
 
   await app.startAllMicroservices();
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(env.PORT);
 }
 bootstrap();
