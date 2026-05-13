@@ -5,6 +5,16 @@
   "author": "Gian Carlo Marino",
   "private": true,
   "license": "UNLICENSED",
+  "imports": {
+    "#generated/prisma-db1": {
+      "types": "./src/generated/prisma-db1/index.d.ts",
+      "require": "./src/generated/prisma-db1/index.js"
+    },
+    "#generated/prisma-db2": {
+      "types": "./src/generated/prisma-db2/index.d.ts",
+      "require": "./src/generated/prisma-db2/index.js"
+    }
+  },
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -17,7 +27,10 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "prisma:generate": "prisma generate --config prisma.config.db1.ts && prisma generate --config prisma.config.db2.ts",
+    "prisma:migrate:db1": "prisma migrate dev --config prisma.config.db1.ts",
+    "prisma:migrate:db2": "prisma migrate dev --config prisma.config.db2.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

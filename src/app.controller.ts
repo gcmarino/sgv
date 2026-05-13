@@ -1,11 +1,9 @@
 import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { PrismaService } from './shared/prisma/prisma.service';
 
 @Controller()
 export class AppController {
   constructor(
-    private readonly prisma: PrismaService,
     @Inject('RABBITMQ_CLIENT') private readonly rmqClient: ClientProxy,
   ) {}
 

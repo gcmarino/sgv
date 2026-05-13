@@ -1,0 +1,1853 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma-db1"
+}
+
+datasource db {
+  provider = "sqlserver"
+  schemas  = ["OrderManagement", "dbo"]
+}
+
+model Agents {
+  Id       Int    @id(map: "PK_Agents")
+  Name     String @db.NVarChar(1024)
+  OfficeId Int
+
+  @@schema("dbo")
+}
+
+model AspNetRoleClaims {
+  Id          Int         @id(map: "PK_AspNetRoleClaims") @default(autoincrement())
+  RoleId      Int
+  ClaimType   String?     @db.NVarChar(Max)
+  ClaimValue  String?     @db.NVarChar(Max)
+  AspNetRoles AspNetRoles @relation(fields: [RoleId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_AspNetRoleClaims_AspNetRoles_RoleId")
+
+  @@index([RoleId], map: "IX_AspNetRoleClaims_RoleId")
+  @@schema("dbo")
+}
+
+model AspNetRoles {
+  Id               Int                @id(map: "PK_AspNetRoles")
+  Name             String?            @db.NVarChar(256)
+  NormalizedName   String?            @unique(map: "RoleNameIndex") @db.NVarChar(256)
+  ConcurrencyStamp String?            @db.NVarChar(Max)
+  AspNetRoleClaims AspNetRoleClaims[]
+  AspNetUserRoles  AspNetUserRoles[]
+
+  @@schema("dbo")
+}
+
+model AspNetUserClaims {
+  Id          Int         @id(map: "PK_AspNetUserClaims") @default(autoincrement())
+  UserId      Int
+  ClaimType   String?     @db.NVarChar(Max)
+  ClaimValue  String?     @db.NVarChar(Max)
+  AspNetUsers AspNetUsers @relation(fields: [UserId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_AspNetUserClaims_AspNetUsers_UserId")
+
+  @@index([UserId], map: "IX_AspNetUserClaims_UserId")
+  @@schema("dbo")
+}
+
+model AspNetUserLogins {
+  LoginProvider       String      @db.NVarChar(450)
+  ProviderKey         String      @db.NVarChar(450)
+  ProviderDisplayName String?     @db.NVarChar(Max)
+  UserId              Int
+  AspNetUsers         AspNetUsers @relation(fields: [UserId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_AspNetUserLogins_AspNetUsers_UserId")
+
+  @@id([LoginProvider, ProviderKey], map: "PK_AspNetUserLogins")
+  @@index([UserId], map: "IX_AspNetUserLogins_UserId")
+  @@schema("dbo")
+}
+
+model AspNetUserRoles {
+  UserId      Int
+  RoleId      Int
+  Status      Int
+  AspNetRoles AspNetRoles @relation(fields: [RoleId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_AspNetUserRoles_AspNetRoles_RoleId")
+  AspNetUsers AspNetUsers @relation(fields: [UserId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_AspNetUserRoles_AspNetUsers_UserId")
+
+  @@id([UserId, RoleId], map: "PK_AspNetUserRoles")
+  @@index([RoleId], map: "IX_AspNetUserRoles_RoleId")
+  @@schema("dbo")
+}
+
+model AspNetUsers {
+  Id                    Int                     @id(map: "PK_AspNetUsers")
+  UserName              String?                 @db.NVarChar(256)
+  NormalizedUserName    String?                 @unique(map: "UserNameIndex") @db.NVarChar(256)
+  Email                 String?                 @db.NVarChar(256)
+  NormalizedEmail       String?                 @db.NVarChar(256)
+  EmailConfirmed        Boolean
+  PasswordHash          String?                 @db.NVarChar(Max)
+  SecurityStamp         String?                 @db.NVarChar(Max)
+  ConcurrencyStamp      String?                 @db.NVarChar(Max)
+  PhoneNumber           String?                 @db.NVarChar(Max)
+  PhoneNumberConfirmed  Boolean
+  TwoFactorEnabled      Boolean
+  LockoutEnd            DateTime?               @db.DateTimeOffset
+  LockoutEnabled        Boolean
+  AccessFailedCount     Int
+  Name                  String?                 @db.NVarChar(Max)
+  Phone                 String?                 @db.NVarChar(Max)
+  BirthDate             DateTime?               @db.DateTimeOffset
+  Gender                Int?
+  Avatar                String?                 @db.NVarChar(Max)
+  ReferralCode          String?                 @db.NVarChar(255)
+  CreatedAt             DateTime?               @db.DateTimeOffset
+  DocumentNumber        String?                 @db.NVarChar(50)
+  AspNetUserClaims      AspNetUserClaims[]
+  AspNetUserLogins      AspNetUserLogins[]
+  AspNetUserRoles       AspNetUserRoles[]
+  AspNetUserTokens      AspNetUserTokens[]
+  DebtCollectors        DebtCollectors?
+  DeliveryServiceClaims DeliveryServiceClaims[]
+  Drivers               Drivers?
+  RefreshTokens         RefreshTokens[]
+  SavedCards            SavedCards[]
+
+  @@index([NormalizedEmail], map: "EmailIndex")
+  @@index([UserName], map: "nci_wi_AspNetUsers_D3BEA568FB285FE4954473DEC1A7D1C1")
+  @@schema("dbo")
+}
+
+model AspNetUserTokens {
+  UserId        Int
+  LoginProvider String      @db.NVarChar(450)
+  Name          String      @db.NVarChar(450)
+  Value         String?     @db.NVarChar(Max)
+  AspNetUsers   AspNetUsers @relation(fields: [UserId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_AspNetUserTokens_AspNetUsers_UserId")
+
+  @@id([UserId, LoginProvider, Name], map: "PK_AspNetUserTokens")
+  @@schema("dbo")
+}
+
+model BankTransfers {
+  PaymentId  Int       @id(map: "PK_BankTransfers")
+  Status     Int
+  AcceptedAt DateTime? @db.DateTimeOffset
+
+  @@schema("OrderManagement")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model OrderManagement_BillingInfos {
+  OrderId         Int
+  DocumentNumber  String? @db.NVarChar(20)
+  BussinesName    String?
+  InvoiceRequired Boolean
+
+  @@map("BillingInfos")
+  @@ignore
+  @@schema("OrderManagement")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model dbo_BillingInfos {
+  Id             Int
+  ConsumerId     Int
+  BusinessName   String
+  DocumentNumber String    @db.NVarChar(20)
+  DeletedAt      DateTime? @db.DateTimeOffset
+
+  @@map("BillingInfos")
+  @@ignore
+  @@schema("dbo")
+}
+
+model BlockedConsumers {
+  ConsumerId Int
+  StoreId    Int
+
+  @@id([ConsumerId, StoreId], map: "PK_BlockedConsumers")
+  @@schema("OrderManagement")
+}
+
+model BroadcastMessageContacts {
+  BroadcastMessageId        Int
+  BroadcastMessageContactId Int
+  IsSuccess                 Boolean
+  PhoneNumber               String    @db.NVarChar(50)
+  CompletedAt               DateTime? @db.DateTimeOffset
+
+  @@id([BroadcastMessageId, BroadcastMessageContactId], map: "PK_BroadcastMessageContacts")
+  @@schema("dbo")
+}
+
+model BroadcastMessages {
+  BroadcastMessageId Int       @id(map: "PK_BroadcastMessages")
+  MessageTemplateId  Int
+  Status             Int
+  Total              Int
+  Successes          Int
+  Failures           Int
+  File               String    @db.NVarChar(50)
+  RegisteredAt       DateTime  @db.DateTimeOffset
+  LoadedAt           DateTime? @db.DateTimeOffset
+  CompletedAt        DateTime? @db.DateTimeOffset
+  LastUpdate         DateTime? @db.DateTimeOffset
+
+  @@schema("dbo")
+}
+
+model dbo_BusinessCategories {
+  Id        Int       @id(map: "PK_ConsumerTypes")
+  Name      String    @db.NVarChar(255)
+  DeletedAt DateTime? @db.DateTimeOffset
+
+  @@map("BusinessCategories")
+  @@schema("dbo")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model OrderManagement_BusinessCategories {
+  Id   Int
+  Name String @db.NVarChar(255)
+
+  @@map("BusinessCategories")
+  @@ignore
+  @@schema("OrderManagement")
+}
+
+model CancelReasons {
+  Id          Int       @id(map: "PK_CancelReasons")
+  Description String    @db.NVarChar(500)
+  DeletedAt   DateTime? @db.DateTimeOffset
+  Orders      Orders[]
+
+  @@schema("OrderManagement")
+}
+
+model Cities {
+  CityId       Int         @id(map: "PK_Cities")
+  DepartmentId Int
+  Name         String      @db.NVarChar(255)
+  Departments  Departments @relation(fields: [DepartmentId], references: [DepartmentId], onDelete: Cascade, onUpdate: NoAction, map: "FK_Cities_Departments_DepartmentId")
+
+  @@schema("OrderManagement")
+}
+
+model CollectionPoints {
+  PaymentId  Int       @id(map: "PK_CollectionPoints")
+  Status     Int
+  ExternalId String?   @db.NVarChar(255)
+  TrackingId String    @db.NVarChar(15)
+  PaidAt     DateTime? @db.DateTimeOffset
+
+  @@schema("OrderManagement")
+}
+
+model ConsumerProperties {
+  Id        Int      @id(map: "PK_ConsumerProperties")
+  Type      Int
+  Name      String   @db.NVarChar(255)
+  IsEnabled Boolean
+  CreatedAt DateTime @db.DateTimeOffset
+  Values    String?  @db.NVarChar(Max)
+
+  @@schema("dbo")
+}
+
+model ConsumerPropertyValues {
+  ConsumerId Int
+  Name       String    @db.NVarChar(255)
+  Value      String?   @db.NVarChar(255)
+  Consumers  Consumers @relation(fields: [ConsumerId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_ConsumerPropertyValues_Consumers_Id")
+
+  @@id([ConsumerId, Name], map: "PK_ConsumerPropertyValues")
+  @@schema("dbo")
+}
+
+model ConsumerRatings {
+  OrderId  Int      @id(map: "PK_ConsumerRatings")
+  ThumbsUp Boolean
+  RatedAt  DateTime @db.DateTimeOffset
+  Comments String?
+  Orders   Orders   @relation(fields: [OrderId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_ConsumerRatings_Orders_Id")
+
+  @@schema("OrderManagement")
+}
+
+model Consumers {
+  Id                                                                 Int                      @id(map: "PK_Consumers")
+  Status                                                             Int
+  IsEligibleForLoanRequest                                           Boolean
+  BusinessCategoryId                                                 Int?
+  EstimatedMonthlySales                                              Decimal?                 @db.Decimal(19, 4)
+  NumberOfProducts                                                   Int?
+  SalesmanId                                                         Int?
+  BusinessType                                                       Int
+  DeliveryLocationsId                                                Int?
+  ConsumerPropertyValues                                             ConsumerPropertyValues[]
+  DeliveryLocations_Consumers_DeliveryLocationsIdToDeliveryLocations DeliveryLocations?       @relation("Consumers_DeliveryLocationsIdToDeliveryLocations", fields: [DeliveryLocationsId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Consumers_DeliveryLocations")
+  DeliveryLocations_DeliveryLocations_ConsumerIdToConsumers          DeliveryLocations[]      @relation("DeliveryLocations_ConsumerIdToConsumers")
+  StoreAccess                                                        StoreAccess[]
+
+  @@index([SalesmanId], map: "nci_msft_1_Consumers_FE732A2FBCE4E98709E821B24BF747D3")
+  @@schema("dbo")
+}
+
+model Coupons {
+  Id                 Int       @id(map: "PK_Coupons")
+  IsEnabled          Boolean
+  Discount           Decimal   @db.Decimal(19, 4)
+  Code               String    @db.NVarChar(255)
+  MinimalOrderAmount Decimal   @db.Decimal(19, 4)
+  MaxNumberOfUsages  Int
+  Stock              Int?
+  EndAt              DateTime? @db.DateTimeOffset
+  CreatedAt          DateTime  @db.DateTimeOffset
+  StartAt            DateTime  @db.DateTimeOffset
+  StoreId            Int
+
+  @@schema("OrderManagement")
+}
+
+model CreditLinePreRequests {
+  CreditLinePreRequestId Int       @id(map: "PK_CreditLinePreRequests")
+  ConsumerId             Int
+  Status                 Int
+  ApprovedAt             DateTime? @db.DateTimeOffset
+  RejectedAt             DateTime? @db.DateTimeOffset
+  CreatedAt              DateTime  @db.DateTimeOffset
+
+  @@schema("OrderManagement")
+}
+
+model CreditLineQuantiles {
+  CreditLineQuantileId Int     @id(map: "PK_CreditLineQuantiles")
+  Index                Int
+  Limit                Decimal @db.Decimal(19, 4)
+  DiscountRate         Decimal @db.Decimal(19, 4)
+  InitialPercentage    Decimal @db.Decimal(19, 4)
+
+  @@schema("OrderManagement")
+}
+
+model CreditLineRequests {
+  CreditLineRequestId                Int          @id(map: "PK_CreditLineRequests")
+  Status                             Int
+  ExternalSigningEntityId            String?      @db.NVarChar(100)
+  ExternalTransactionId              String?      @db.NVarChar(100)
+  ExternalSignatureUrl               String?
+  CreatedAt                          DateTime     @db.DateTimeOffset
+  StartedAt                          DateTime?    @db.DateTimeOffset
+  ValidatedAt                        DateTime?    @db.DateTimeOffset
+  UploadedAt                         DateTime?    @db.DateTimeOffset
+  ResumedAt                          DateTime?    @db.DateTimeOffset
+  AcknowledgedAt                     DateTime?    @db.DateTimeOffset
+  SignedAt                           DateTime?    @db.DateTimeOffset
+  DownloadedAt                       DateTime?    @db.DateTimeOffset
+  ApprovedAt                         DateTime?    @db.DateTimeOffset
+  RejectedAt                         DateTime?    @db.DateTimeOffset
+  Address                            String?
+  FirstName                          String?      @db.NVarChar(255)
+  LastName                           String?      @db.NVarChar(500)
+  PhoneNumber                        String?      @db.NVarChar(256)
+  ExpeditionCity                     String?      @db.NVarChar(255)
+  DocumentType                       String?      @db.NVarChar(10)
+  Complement                         String?      @db.NVarChar(10)
+  Email                              String?      @db.NVarChar(256)
+  DocumentNumber                     String?      @db.NVarChar(20)
+  ConsumerId                         Int
+  BackDocumentUrl                    String?
+  FrontDocumentUrl                   String?
+  DocumentUrl                        String?
+  SignedDocumentUrl                  String?
+  ExternalDocumentId                 String?      @db.NVarChar(100)
+  Limit                              Decimal?     @db.Decimal(19, 6)
+  HaveYouHadCreditsInFinancialSystem Boolean?
+  HaveYouHadCreditsInSalesCompany    Boolean?
+  IsItRenewal                        Boolean
+  Birthday                           DateTime?    @db.DateTimeOffset
+  RejectionReason                    String?      @db.NVarChar(100)
+  CreditLineQuantileId               Int?
+  MarkedAsPendingReviewAt            DateTime?    @db.DateTimeOffset
+  CreditLines                        CreditLines?
+
+  @@schema("OrderManagement")
+}
+
+model CreditLines {
+  CreditLineId       Int                @id(map: "PK_CreditLines")
+  ConsumerId         Int
+  Limit              Decimal            @db.Decimal(19, 6)
+  Balance            Decimal            @db.Decimal(19, 6)
+  CreatedAt          DateTime           @db.DateTimeOffset
+  ExpirationDate     DateTime           @db.DateTimeOffset
+  RenewedAt          DateTime?          @db.DateTimeOffset
+  CreditLineRequests CreditLineRequests @relation(fields: [CreditLineId], references: [CreditLineRequestId], onDelete: Cascade, onUpdate: NoAction, map: "FK_CreditLines_CreditLineRequests_CreditLineId")
+
+  @@schema("OrderManagement")
+}
+
+model CreditRequestReferences {
+  PaymentId                Int
+  CreditRequestReferenceId Int      @id(map: "PK_CreditRequestReferences") @default(autoincrement())
+  Name                     String
+  Type                     Int
+  PhoneNumber              String   @db.NVarChar(255)
+  Job                      String?  @db.NVarChar(500)
+  RelationshipType         Int?
+  HomeType                 Int
+  Payments                 Payments @relation(fields: [PaymentId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_CreditRequestReferences_Payments_PaymentId")
+
+  @@schema("OrderManagement")
+}
+
+model CreditRequests {
+  PaymentId                          Int       @id(map: "PK_CreditRequests")
+  OrderId                            Int
+  Email                              String?   @db.NVarChar(256)
+  DocumentNumber                     String?   @db.NVarChar(20)
+  Status                             Int
+  ConsumerId                         Int
+  ValidatedAt                        DateTime? @db.DateTimeOffset
+  SignedAt                           DateTime? @db.DateTimeOffset
+  AcknowledgedAt                     DateTime? @db.DateTimeOffset
+  StartedAt                          DateTime? @db.DateTimeOffset
+  ExternalTransactionId              String?   @db.NVarChar(100)
+  ExternalSignatureUrl               String?
+  Address                            String?
+  ApprovedAt                         DateTime? @db.DateTimeOffset
+  RejectedAt                         DateTime? @db.DateTimeOffset
+  UploadedAt                         DateTime? @db.DateTimeOffset
+  DownloadedAt                       DateTime? @db.DateTimeOffset
+  ResumedAt                          DateTime? @db.DateTimeOffset
+  PhoneNumber                        String?   @db.NVarChar(256)
+  DocumentUrl                        String?
+  ExternalDocumentId                 String?   @db.NVarChar(100)
+  SignedDocumentUrl                  String?
+  FirstName                          String?   @db.NVarChar(255)
+  LastName                           String?   @db.NVarChar(500)
+  BackDocumentUrl                    String?
+  FrontDocumentUrl                   String?
+  Score                              Int?
+  ExpeditionCity                     String?   @db.NVarChar(255)
+  DocumentType                       String?   @db.NVarChar(10)
+  Complement                         String?   @db.NVarChar(10)
+  UserCreditInformationId            Int?
+  ExternalSigningEntityId            String?   @db.NVarChar(100)
+  HaveYouHadCreditsInFinancialSystem Boolean?
+  HaveYouHadCreditsInSalesCompany    Boolean?
+  ApprovedBy                         String?   @db.NVarChar(255)
+  ApprovalReason                     String?
+  BaseDate                           DateTime? @db.DateTimeOffset
+  DiscountRate                       Decimal   @db.Decimal(19, 4)
+  Installments                       Int
+  Amount                             Decimal   @db.Decimal(19, 4)
+  Birthday                           DateTime? @db.DateTimeOffset
+  MarkedAsInconclusiveAt             DateTime? @db.DateTimeOffset
+  MarkedAsWaitingInitialAt           DateTime? @db.DateTimeOffset
+  MarkedAsPendingReviewAt            DateTime? @db.DateTimeOffset
+  ExternalPaymentGatewayId           String?   @db.NVarChar(255)
+  CanceledAt                         DateTime? @db.DateTimeOffset
+  RejectedBy                         String?   @db.NVarChar(255)
+  RejectionReason                    String?
+
+  @@schema("OrderManagement")
+}
+
+model Credits {
+  PaymentId                Int       @id(map: "PK_Credits")
+  Status                   Int
+  ExternalTransactionId    String?   @db.NVarChar(100)
+  ExternalSignatureUrl     String?
+  ExternalSigningEntityId  String?   @db.NVarChar(100)
+  BaseDate                 DateTime  @db.DateTimeOffset
+  Installments             Int
+  DiscountRate             Decimal   @db.Decimal(19, 4)
+  StartedAt                DateTime? @db.DateTimeOffset
+  ValidatedAt              DateTime? @db.DateTimeOffset
+  UploadedAt               DateTime? @db.DateTimeOffset
+  ResumedAt                DateTime? @db.DateTimeOffset
+  AcknowledgedAt           DateTime? @db.DateTimeOffset
+  SignedAt                 DateTime? @db.DateTimeOffset
+  DownloadedAt             DateTime? @db.DateTimeOffset
+  CanceledAt               DateTime? @db.DateTimeOffset
+  RevertedAt               DateTime? @db.DateTimeOffset
+  AppliedAt                DateTime? @db.DateTimeOffset
+  Address                  String?
+  FirstName                String?   @db.NVarChar(255)
+  LastName                 String?   @db.NVarChar(500)
+  PhoneNumber              String?   @db.NVarChar(256)
+  ExpeditionCity           String?   @db.NVarChar(255)
+  Complement               String?   @db.NVarChar(10)
+  DocumentType             String?   @db.NVarChar(10)
+  Email                    String?   @db.NVarChar(256)
+  DocumentNumber           String?   @db.NVarChar(20)
+  OrderId                  Int
+  ConsumerId               Int
+  BackDocumentUrl          String?
+  FrontDocumentUrl         String?
+  CreditLineId             Int
+  Amount                   Decimal   @db.Decimal(19, 4)
+  ApprovedAt               DateTime? @db.DateTimeOffset
+  RejectedAt               DateTime? @db.DateTimeOffset
+  ApprovalNeededAt         DateTime? @db.DateTimeOffset
+  ExternalPaymentGatewayId String?   @db.NVarChar(255)
+  Birthday                 DateTime? @db.DateTimeOffset
+
+  @@schema("OrderManagement")
+}
+
+model DealItems {
+  DealItemId  String @id(map: "PK_DealItems") @db.NVarChar(50)
+  OrderItemId BigInt
+  DealId      String @db.NVarChar(50)
+  Deals       Deals  @relation(fields: [DealId], references: [DealId], onDelete: Cascade, onUpdate: NoAction, map: "FK_DealItems_Deals_DealId")
+
+  @@schema("OrderManagement")
+}
+
+model Deals {
+  DealId     String      @id(map: "PK_Deals") @db.NVarChar(50)
+  OrderId    Int
+  PipelineId String      @db.NVarChar(10)
+  PersonId   String      @db.NVarChar(50)
+  DealItems  DealItems[]
+  Orders     Orders      @relation(fields: [OrderId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Deals_Orders_OrderId")
+
+  @@schema("OrderManagement")
+}
+
+model DebtCollectorAssignments {
+  OrderId         Int    @id(map: "PK_DebtCollectorAssignments")
+  DebtCollectorId Int
+  Orders          Orders @relation(fields: [OrderId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_DebtCollectorAssignments_Orders_OrderId")
+
+  @@schema("OrderManagement")
+}
+
+model DebtCollectors {
+  DebtCollectorId Int         @id(map: "PK_DebtCollectors")
+  IsEnabled       Boolean
+  AspNetUsers     AspNetUsers @relation(fields: [DebtCollectorId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_DebtCollectors_AspNetUsers_DebtCollectorId")
+
+  @@schema("dbo")
+}
+
+model DeliveryCostIntervals {
+  DeliveryCostIntervalId Int
+  DeliveryCostId         Int
+  StartAt                Decimal       @db.Decimal(19, 4)
+  EndAt                  Decimal       @db.Decimal(19, 4)
+  Amount                 Decimal       @db.Decimal(19, 4)
+  DeliveryCosts          DeliveryCosts @relation(fields: [DeliveryCostId], references: [DeliveryCostId], onDelete: Cascade, onUpdate: NoAction, map: "FK_DeliveryCostIntervals_DeliveryCosts_DeliveryCostId")
+
+  @@id([DeliveryCostId, DeliveryCostIntervalId], map: "PK_DeliveryCostIntervals")
+  @@schema("OrderManagement")
+}
+
+model DeliveryCosts {
+  DeliveryCostId        Int                     @id(map: "PK_DeliveryCosts")
+  Name                  String                  @db.NVarChar(255)
+  IsEnabled             Boolean
+  DeliveryCostIntervals DeliveryCostIntervals[]
+
+  @@schema("OrderManagement")
+}
+
+model DeliveryLocations {
+  Id                                                         Int         @id(map: "PK_DeliveryLocations")
+  Name                                                       String      @db.NVarChar(256)
+  Reference                                                  String?     @db.NVarChar(Max)
+  Address                                                    String      @db.NVarChar(Max)
+  Latitude                                                   Decimal     @db.Decimal(17, 14)
+  Longitude                                                  Decimal     @db.Decimal(17, 14)
+  ConsumerId                                                 Int
+  Type                                                       Int
+  Instructions                                               String?     @db.NVarChar(Max)
+  DeletedAt                                                  DateTime?   @db.DateTimeOffset
+  City                                                       String?     @db.NVarChar(256)
+  Consumers_Consumers_DeliveryLocationsIdToDeliveryLocations Consumers[] @relation("Consumers_DeliveryLocationsIdToDeliveryLocations")
+  Consumers_DeliveryLocations_ConsumerIdToConsumers          Consumers   @relation("DeliveryLocations_ConsumerIdToConsumers", fields: [ConsumerId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_DeliveryLocations_Consumers_Id")
+
+  @@index([ConsumerId], map: "IX_DeliveryLocations_ConsumerId")
+  @@index([ConsumerId, DeletedAt], map: "nci_wi_DeliveryLocations_743A8099E7B488E78E0C29425A9F8652")
+  @@schema("dbo")
+}
+
+model DeliveryServiceClaims {
+  Id          Int         @id(map: "PK_DeliveryServiceClaims")
+  ClaimId     String
+  UserId      Int
+  OrderId     Int?
+  CreatedAt   DateTime?   @db.DateTimeOffset
+  UpdatedAt   DateTime?   @db.DateTimeOffset
+  AspNetUsers AspNetUsers @relation(fields: [UserId], references: [Id], onUpdate: NoAction, map: "FK_DeliveryServiceClaims_AspNetUsers")
+  Orders      Orders?     @relation(fields: [OrderId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_DeliveryServiceClaims_Orders")
+
+  @@index([OrderId], map: "IX_DeliveryServiceClaims_OrderId")
+  @@index([UserId], map: "IX_DeliveryServiceClaims_UserId")
+  @@schema("OrderManagement")
+}
+
+model DeliveryServiceClaimsStatus {
+  Id        Int       @id(map: "PK_DeliveryServiceClaimsStatus")
+  ClaimId   String
+  Status    String    @db.NVarChar(256)
+  CreatedAt DateTime? @db.DateTimeOffset
+
+  @@schema("OrderManagement")
+}
+
+model Departments {
+  DepartmentId Int      @id(map: "PK_Departments")
+  Name         String   @db.NVarChar(255)
+  Cities       Cities[]
+
+  @@schema("OrderManagement")
+}
+
+model Docks {
+  DockId    Int     @id(map: "PK_Docks")
+  VendorId  Int
+  Name      String  @db.NVarChar(255)
+  Reference String?
+  Address   String
+  CityId    Int
+  Latitude  Decimal @db.Decimal(17, 14)
+  Longitude Decimal @db.Decimal(17, 14)
+  Vendors   Vendors @relation(fields: [VendorId], references: [VendorId], onDelete: Cascade, onUpdate: NoAction, map: "FK_Docks_Vendors_VendorId")
+
+  @@schema("OrderManagement")
+}
+
+model DocumentSeries {
+  Id           Int       @id(map: "PK_DocumentSeries") @default(autoincrement())
+  DocumentType String    @db.VarChar(50)
+  SeriesCode   String    @db.VarChar(30)
+  LastNumber   Int
+  NumberLength Int
+  Separator    String    @db.VarChar(5)
+  IsActive     Boolean
+  CreatedAt    DateTime
+  ModifiedAt   DateTime?
+
+  @@unique([DocumentType, SeriesCode], map: "UQ_DocumentSeries")
+  @@schema("OrderManagement")
+}
+
+model Drivers {
+  DriverId     Int            @id(map: "PK_Drivers")
+  IsEnabled    Boolean
+  AspNetUsers  AspNetUsers    @relation(fields: [DriverId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Drivers_AspNetUsers_DriverId")
+  DriverStores DriverStores[]
+
+  @@schema("dbo")
+}
+
+model DriverStores {
+  DriverId Int
+  StoreId  Int
+  Drivers  Drivers @relation(fields: [DriverId], references: [DriverId], onDelete: Cascade, onUpdate: NoAction, map: "FK_DriverStores_Drivers_DriverId")
+
+  @@id([DriverId, StoreId], map: "PK_DriverStores")
+  @@schema("dbo")
+}
+
+model LeadFields {
+  LeadId Int
+  Name   String @db.NVarChar(255)
+  Value  String @db.NVarChar(1024)
+
+  @@id([LeadId, Name], map: "PK_LeadFields")
+  @@schema("dbo")
+}
+
+model Leads {
+  Id             Int      @id(map: "PK_Leads")
+  ConsumerId     Int?
+  StoreId        Int
+  Name           String   @db.NVarChar(1024)
+  Email          String?  @db.NVarChar(255)
+  FormId         String   @db.NVarChar(1024)
+  DocumentNumber String?  @db.NVarChar(255)
+  Address        String?  @db.NVarChar(1024)
+  PhoneNumber    String   @db.NVarChar(255)
+  CreatedAt      DateTime @db.DateTimeOffset
+
+  @@schema("dbo")
+}
+
+model LimitedStoreProductGroups {
+  Id                   Int                    @id(map: "PK_LimitedStoreProductGroups")
+  Name                 String                 @db.NVarChar(255)
+  IsEnabled            Boolean
+  StoreId              Int
+  Unit                 Int
+  Quantity             Decimal                @db.Decimal(19, 4)
+  CreatedAt            DateTime               @db.DateTimeOffset
+  LimitedStoreProducts LimitedStoreProducts[]
+
+  @@schema("OrderManagement")
+}
+
+model LimitedStoreProducts {
+  LimitedStoreProductGroupId Int
+  StoreProductId             Int
+  Unit                       Int
+  Factor                     Decimal                   @db.Decimal(19, 4)
+  LimitedStoreProductGroups  LimitedStoreProductGroups @relation(fields: [LimitedStoreProductGroupId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_LimitedStoreProducts_LimitedStoreProductGroup_LimitedStoreProductGroupId")
+
+  @@id([LimitedStoreProductGroupId, StoreProductId], map: "PK_LimitedStoreProducts")
+  @@schema("OrderManagement")
+}
+
+model MessageTemplates {
+  MessageTemplateId Int     @id(map: "PK_MessageTemplates")
+  IsEnabled         Boolean
+  Name              String  @db.NVarChar(50)
+
+  @@schema("dbo")
+}
+
+model NewOrderSnapshots {
+  OrderId Int    @id(map: "PK_NewOrderSnapshots")
+  Value   String @db.NVarChar(Max)
+
+  @@schema("OrderManagement")
+}
+
+model NewPromissoryNotes {
+  UploadedAt         DateTime? @db.DateTimeOffset
+  DownloadedAt       DateTime? @db.DateTimeOffset
+  Status             Int
+  DocumentUrl        String?
+  ExternalDocumentId String?   @db.NVarChar(100)
+  SignedDocumentUrl  String?
+  PaymentId          Int
+  Amount             Decimal   @db.Decimal(19, 4)
+  DiscountedAmount   Decimal   @db.Decimal(19, 4)
+  Installment        Int
+  DueDate            DateTime  @db.DateTimeOffset
+  PaidAt             DateTime? @db.DateTimeOffset
+  ExternalCrmId      String?   @db.NVarChar(100)
+  PromissoryNoteId   Int       @id(map: "PK_NewPromissoryNotes")
+  ConfirmedAt        DateTime? @db.DateTimeOffset
+  ConfirmationType   Int?
+
+  @@schema("OrderManagement")
+}
+
+model NotificationContacts {
+  NotificationId        Int
+  NotificationContactId Int
+  IsSuccess             Boolean
+  PhoneNumber           String    @db.NVarChar(50)
+  Title                 String    @db.NVarChar(100)
+  Body                  String    @db.NVarChar(400)
+  CompletedAt           DateTime? @db.DateTimeOffset
+
+  @@id([NotificationId, NotificationContactId], map: "PK_NotificationContacts")
+  @@schema("dbo")
+}
+
+model Notifications {
+  NotificationId Int       @id(map: "PK_Notifications")
+  Status         Int
+  Total          Int
+  Successes      Int
+  Failures       Int
+  File           String    @db.NVarChar(50)
+  RegisteredAt   DateTime  @db.DateTimeOffset
+  LoadedAt       DateTime? @db.DateTimeOffset
+  CompletedAt    DateTime? @db.DateTimeOffset
+  LastUpdate     DateTime? @db.DateTimeOffset
+
+  @@schema("dbo")
+}
+
+model Offices {
+  Id   Int    @id(map: "PK_Offices")
+  Name String @db.NVarChar(1024)
+
+  @@schema("dbo")
+}
+
+model OrderItemAttributeValues {
+  OrderItemId      BigInt
+  AttributeValueId Int
+  OrderItems       OrderItems @relation(fields: [OrderItemId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_OrderItemAttributeValues_OrderItems_OrderItemId")
+
+  @@id([OrderItemId, AttributeValueId], map: "PK_OrderItemAttributeValues")
+  @@schema("OrderManagement")
+}
+
+model OrderItemBreakdownItems {
+  OrderItemId    BigInt
+  StoreProductId Int
+  Name           String     @db.NVarChar(255)
+  Quantity       Decimal    @db.Decimal(19, 4)
+  Price          Decimal    @db.Decimal(19, 4)
+  Unit           Int
+  Sku            String?    @db.NVarChar(32)
+  ImageUrl       String?    @db.NVarChar(255)
+  StoreCode      String?    @db.NVarChar(255)
+  StoreId        Int?
+  OrderItems     OrderItems @relation(fields: [OrderItemId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_OrderItemProductPackItems_OrderItems_OrderItemId")
+
+  @@id([OrderItemId, StoreProductId], map: "PK_OrderItemProductPackItems")
+  @@schema("OrderManagement")
+}
+
+model OrderItems {
+  Id                       BigInt                     @id(map: "PK_OrderItems") @default(autoincrement())
+  StoreProductId           Int
+  OrderId                  Int
+  Name                     String                     @db.NVarChar(255)
+  Price                    Decimal                    @db.Decimal(19, 4)
+  Quantity                 Decimal                    @db.Decimal(19, 4)
+  CreatedAt                DateTime                   @db.DateTimeOffset
+  Unit                     Int
+  Instructions             String?                    @db.NVarChar(2000)
+  PercentageDiscount       Decimal                    @db.Decimal(19, 4)
+  BasePrice                Decimal                    @db.Decimal(19, 4)
+  Discount                 Decimal                    @db.Decimal(19, 4)
+  Installments             Int
+  InstallmentsPlanId       Int?
+  DiscountRate             Decimal                    @db.Decimal(19, 4)
+  ShippingPolicyId         Int?
+  VolumetricWeight         Decimal                    @db.Decimal(19, 4)
+  FreeQuantity             Decimal                    @db.Decimal(19, 4)
+  Sku                      String?                    @db.NVarChar(32)
+  ImageUrl                 String?                    @db.NVarChar(255)
+  StoreCode                String?                    @db.NVarChar(255)
+  StoreId                  Int?
+  DiscountType             Int?
+  DiscountApp              Decimal?                   @db.Decimal(18, 2)
+  ReturnedQuantity         Decimal                    @db.Decimal(19, 4)
+  OrderItemAttributeValues OrderItemAttributeValues[]
+  OrderItemBreakdownItems  OrderItemBreakdownItems[]
+  Orders                   Orders                     @relation(fields: [OrderId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_OrderItems_Orders_Id")
+  OrderReturnItems         OrderReturnItems[]
+
+  @@index([OrderId], map: "nci_msft_1_OrderItems_9C0197E5A49BD5E0B31A9CAF563815E6")
+  @@index([StoreProductId], map: "nci_wi_OrderItems_64A64B33C3CA4D50E45EDADD32F60838")
+  @@index([OrderId], map: "nci_wi_OrderItems_AB94D8D3C25CDA6F23665BEC0EA5A264")
+  @@schema("OrderManagement")
+}
+
+model OrderModificationActions {
+  Id                  BigInt             @id(map: "PK_OrderModificationActions") @default(autoincrement())
+  Type                Int
+  OrderModificationId Int
+  CreatedAt           DateTime           @db.DateTimeOffset
+  StoreProductId      Int
+  OrderItemId         BigInt?
+  ToQuantity          Decimal?           @db.Decimal(19, 4)
+  ToUnit              Int?
+  Price               Decimal?           @db.Decimal(19, 4)
+  ToPrice             Decimal?           @db.Decimal(19, 4)
+  Unit                Int?
+  Quantity            Decimal?           @db.Decimal(19, 4)
+  Name                String?            @db.NVarChar(255)
+  OrderModifications  OrderModifications @relation(fields: [OrderModificationId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_OrderModificationActions_OrderModifications_Id")
+
+  @@index([OrderModificationId, Type], map: "nci_wi_OrderModificationActions_9BC420377C4A93A08DB0001C9A22E0E6")
+  @@index([Type], map: "nci_wi_OrderModificationActions_A130AFF0DA9F6028A4A2DF9730F34D08")
+  @@schema("OrderManagement")
+}
+
+model OrderModificationItems {
+  Id                  BigInt             @id(map: "PK_OrderModificationItems") @default(autoincrement())
+  StoreProductId      Int
+  OrderItemId         BigInt?
+  OrderModificationId Int
+  Name                String             @db.NVarChar(255)
+  Price               Decimal            @db.Decimal(19, 4)
+  Quantity            Decimal            @db.Decimal(19, 4)
+  Unit                Int
+  FreeQuantity        Decimal            @db.Decimal(19, 4)
+  Sku                 String?            @db.NVarChar(32)
+  ImageUrl            String?            @db.NVarChar(255)
+  StoreCode           String?            @db.NVarChar(255)
+  StoreId             Int?
+  OrderModifications  OrderModifications @relation(fields: [OrderModificationId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_OrderModificationItems_OrderModifications_Id")
+
+  @@index([OrderModificationId], map: "nci_wi_OrderModificationItems_F8A503E3E4258103BE2CE9B89CFDBCA9")
+  @@schema("OrderManagement")
+}
+
+model OrderModifications {
+  Id                       Int                        @id(map: "PK_OrderModifications")
+  ShopperAssignmentId      Int?
+  OrderId                  Int
+  ConfirmedAt              DateTime?                  @db.DateTimeOffset
+  CreatedAt                DateTime                   @db.DateTimeOffset
+  CanceledAt               DateTime?                  @db.DateTimeOffset
+  ClosedAt                 DateTime?                  @db.DateTimeOffset
+  Status                   Int
+  ApprovalRequestedAt      DateTime?                  @db.DateTimeOffset
+  ConfirmedByConsumer      Boolean?
+  OrderModificationActions OrderModificationActions[]
+  OrderModificationItems   OrderModificationItems[]
+  Orders                   Orders                     @relation(fields: [OrderId], references: [Id], onUpdate: NoAction, map: "FK_OrderModifications_Orders_Id")
+  ShopperAssignments       ShopperAssignments?        @relation(fields: [ShopperAssignmentId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_OrderModifications_ShopperAssignments_Id")
+
+  @@index([CanceledAt, Status], map: "nci_msft_1_OrderModifications_6674EF2668EF423105E0D209671183C5")
+  @@index([CanceledAt, OrderId, Status], map: "nci_wi_OrderModifications_A1FD3FC19C77361A218BDDF8F3362577")
+  @@index([ShopperAssignmentId, CanceledAt], map: "nci_wi_OrderModifications_F38F2B49C4849ECE97F5AB40974366AF")
+  @@schema("OrderManagement")
+}
+
+model OrderReturnItems {
+  Id               BigInt     @id(map: "PK_OrderReturnItems") @default(autoincrement())
+  OrderItemId      BigInt
+  ReturnTypeId     Int
+  UserId           Int
+  Quantity         Decimal    @db.Decimal(19, 4)
+  RefundAmount     Decimal    @db.Decimal(19, 4)
+  CreatedAt        DateTime   @db.DateTimeOffset
+  ReturnedQuantity Decimal    @db.Decimal(19, 4)
+  OrderItems       OrderItems @relation(fields: [OrderItemId], references: [Id], onUpdate: NoAction, map: "FK_OrderReturnItems_OrderItems")
+  ReturnType       ReturnType @relation(fields: [ReturnTypeId], references: [ReturnTypeId], onUpdate: NoAction, map: "FK_OrderReturnItems_ReturnType")
+
+  @@schema("OrderManagement")
+}
+
+model Orders {
+  Id                       Int                       @id(map: "PK_Orders")
+  ConsumerId               Int
+  StoreId                  Int
+  Email                    String?                   @db.NVarChar(256)
+  DrivingFee               Decimal                   @db.Decimal(19, 4)
+  PickingFee               Decimal                   @db.Decimal(19, 4)
+  SubTotal                 Decimal                   @db.Decimal(19, 4)
+  Total                    Decimal                   @db.Decimal(19, 4)
+  Status                   Int
+  CreatedAt                DateTime                  @db.DateTimeOffset
+  CanceledAt               DateTime?                 @db.DateTimeOffset
+  CompletedAt              DateTime?                 @db.DateTimeOffset
+  CancelSource             Int?
+  CancelReasonId           Int?
+  PaymentFee               Decimal                   @db.Decimal(19, 4)
+  PaymentMethodCommission  Decimal                   @db.Decimal(19, 4)
+  PaymentMethod            Int
+  PaymentId                Int?
+  InvoiceRequired          Boolean
+  DocumentNumber           String?                   @db.NVarChar(20)
+  BussinesName             String?
+  TrackingId               String?                   @unique(map: "OrderTrackingIdIndex") @db.NVarChar(15)
+  Discount                 Decimal                   @db.Decimal(19, 4)
+  CouponId                 Int?
+  ConfirmedAt              DateTime?                 @db.DateTimeOffset
+  AssignedAt               DateTime?                 @db.DateTimeOffset
+  InPreparationAt          DateTime?                 @db.DateTimeOffset
+  BillingAt                DateTime?                 @db.DateTimeOffset
+  ShippingAt               DateTime?                 @db.DateTimeOffset
+  ArrivedAt                DateTime?                 @db.DateTimeOffset
+  WasCompletedOnTime       Boolean?
+  WasFullyDelivered        Boolean?
+  CouponDiscount           Decimal                   @db.Decimal(19, 4)
+  VolumeDiscount           Decimal                   @db.Decimal(19, 4)
+  CancelUserName           String?                   @db.NVarChar(256)
+  PhoneNumber              String?                   @db.NVarChar(256)
+  SalesmanId               Int?
+  LocalCreatedAt           DateTime?                 @db.DateTimeOffset
+  Initial                  Decimal                   @db.Decimal(19, 4)
+  SalesmanRouteId          Int?
+  InvoiceNumber            String?                   @db.NVarChar(255)
+  ReturnedAt               DateTime?                 @db.DateTimeOffset
+  ReturnReason             String?
+  ChangesAreAllowed        Boolean
+  TotalRefundAmount        Decimal                   @db.Decimal(19, 4)
+  ConsumerRatings          ConsumerRatings?
+  Deals                    Deals[]
+  DebtCollectorAssignments DebtCollectorAssignments?
+  DeliveryServiceClaims    DeliveryServiceClaims[]
+  OrderItems               OrderItems[]
+  OrderModifications       OrderModifications[]
+  CancelReasons            CancelReasons?            @relation(fields: [CancelReasonId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Orders_CancelReasons_CancelReasonId")
+  ReceiptNotes             ReceiptNotes?
+  Sales                    Sales[]
+  ShippingInfos            ShippingInfos?
+  ShopperAssignments       ShopperAssignments?
+  ShopperRatings           ShopperRatings?
+
+  @@index([PaymentId, Status], map: "nci_msft_1_Orders_739A1DF628B50CCDD29A1A3B72C0F552")
+  @@index([SalesmanId, Status, StoreId], map: "nci_msft_1_Orders_811CC4C970B7A20D576861471C4EDF46")
+  @@index([StoreId, Status, CreatedAt], map: "nci_wi_Orders_00AA61A30299FB3E346F6DC0109C58BC")
+  @@index([ConsumerId, Status], map: "nci_wi_Orders_0731AEBF941FEB9E9AAD4B59D5B9EC50")
+  @@index([Status, StoreId], map: "nci_wi_Orders_3086A224FE6271C7CF228059283ED10F")
+  @@index([ConsumerId], map: "nci_wi_Orders_373F2CD0CC285F923526F5FB04060570")
+  @@index([ConsumerId, Status], map: "nci_wi_Orders_71C553FD2B46317748A28C5B7BD2E910")
+  @@index([CouponId], map: "nci_wi_Orders_9165BC347C11E0C1F77038B70F776855")
+  @@index([ConsumerId], map: "nci_wi_Orders_A1B9FD9777312CBA15264567C4F7B2C0")
+  @@index([Status, StoreId], map: "nci_wi_Orders_F2330F701FE8E7DFD391059E9A9BAB40")
+  @@schema("OrderManagement")
+}
+
+model PaymentGatewayUsers {
+  UserId               Int      @id(map: "PK_PaymentGatewayUsers")
+  PaymentGatewayUserId String   @db.NVarChar(50)
+  Token                String
+  Password             String   @db.NVarChar(50)
+  CreatedAt            DateTime @db.DateTimeOffset
+
+  @@schema("OrderManagement")
+}
+
+model PaymentLinks {
+  PaymentId   Int       @id(map: "PK_PaymentLinks")
+  Status      Int
+  ExternalId  String?   @db.NVarChar(255)
+  Link        String?   @db.NVarChar(4000)
+  RequestedAt DateTime? @db.DateTimeOffset
+  PaidAt      DateTime? @db.DateTimeOffset
+
+  @@schema("OrderManagement")
+}
+
+model Payments {
+  Id                      Int                       @id(map: "PK_Payments")
+  SourceId                Int
+  Email                   String?                   @db.NVarChar(256)
+  BusinessName            String?
+  DocumentNumber          String?                   @db.NVarChar(20)
+  Discount                Decimal                   @db.Decimal(19, 4)
+  Amount                  Decimal                   @db.Decimal(19, 4)
+  CreatedAt               DateTime                  @db.DateTimeOffset
+  CanceledAt              DateTime?                 @db.DateTimeOffset
+  CompletedAt             DateTime?                 @db.DateTimeOffset
+  Status                  Int
+  Method                  Int
+  ExternalAuthorizationId String?                   @db.NVarChar(100)
+  InvoiceRequired         Boolean
+  Shipping                Decimal                   @db.Decimal(19, 4)
+  UserId                  Int?
+  StoreId                 Int?
+  Source                  Int?
+  Description             String?                   @db.NVarChar(255)
+  PhoneNumber             String?                   @db.NVarChar(256)
+  LocalCreatedAt          DateTime?                 @db.DateTimeOffset
+  ConfirmedAt             DateTime?                 @db.DateTimeOffset
+  Initial                 Decimal                   @db.Decimal(19, 4)
+  RefundedAt              DateTime?                 @db.DateTimeOffset
+  CreditRequestReferences CreditRequestReferences[]
+
+  @@index([StoreId, UserId, Status], map: "nci_wi_Payments_252DFC0B4B06B0D47E3726FF5AC0BE44")
+  @@schema("OrderManagement")
+}
+
+model Persons {
+  Id             String   @id(map: "PK_Persons") @db.NVarChar(100)
+  DocumentNumber String   @db.NVarChar(20)
+  CreatedAt      DateTime @db.DateTimeOffset
+  Name           String?
+
+  @@schema("OrderManagement")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model PhoneNumberSecurityStamps {
+  PhoneNumber String    @db.NVarChar(256)
+  Value       String    @db.NVarChar(256)
+  CreatedAt   DateTime  @db.DateTimeOffset
+  UpdatedAt   DateTime? @db.DateTimeOffset
+
+  @@ignore
+  @@schema("dbo")
+}
+
+model PromissoryNoteComments {
+  PromissoryNoteCommentId     Int                        @id(map: "PK_PromissoryNoteComments")
+  PromissoryNoteCommentTypeId Int
+  PromissoryNoteId            Int
+  Value                       String
+  PromissoryNoteCommentTypes  PromissoryNoteCommentTypes @relation(fields: [PromissoryNoteCommentTypeId], references: [PromissoryNoteCommentTypeId], onDelete: Cascade, onUpdate: NoAction, map: "FK_PromissoryNoteComments_PromissoryNoteCommentTypeId_PromissoryNoteCommentTypeId")
+
+  @@schema("OrderManagement")
+}
+
+model PromissoryNoteCommentTypes {
+  PromissoryNoteCommentTypeId Int                      @id(map: "PK_PromissoryNoteCommentTypes")
+  Name                        String                   @db.NVarChar(255)
+  PromissoryNoteComments      PromissoryNoteComments[]
+
+  @@schema("OrderManagement")
+}
+
+model PromissoryNoteOwners {
+  PromissoryNoteOwnerId Int     @id(map: "PK_PromissoryNoteOwners")
+  Name                  String  @db.NVarChar(255)
+  IsDefault             Boolean
+
+  @@schema("OrderManagement")
+}
+
+model PromissoryNotePayments {
+  PromissoryNoteId        Int
+  PaymentId               Int
+  PromissoryNotePaymentId Int
+  PaidAt                  DateTime        @db.DateTimeOffset
+  Amount                  Decimal         @db.Decimal(19, 4)
+  DocumentUrl             String?
+  PromissoryNotes         PromissoryNotes @relation(fields: [PromissoryNoteId], references: [PromissoryNoteId], onDelete: Cascade, onUpdate: NoAction, map: "FK_PromissoryNotePayments_PromissoryNotes_PromissoryNoteId")
+
+  @@id([PromissoryNoteId, PromissoryNotePaymentId], map: "PK_PromissoryNotePayments")
+  @@schema("OrderManagement")
+}
+
+model PromissoryNotes {
+  Amount                 Decimal                  @db.Decimal(19, 4)
+  Status                 Int
+  Installment            Int
+  PaymentId              Int
+  DueDate                DateTime                 @db.DateTimeOffset
+  PaidAt                 DateTime?                @db.DateTimeOffset
+  ExternalCrmId          String?                  @db.NVarChar(100)
+  DiscountedAmount       Decimal                  @db.Decimal(19, 4)
+  UploadedAt             DateTime?                @db.DateTimeOffset
+  DocumentUrl            String?
+  ExternalDocumentId     String?                  @db.NVarChar(100)
+  SignedDocumentUrl      String?
+  DownloadedAt           DateTime?                @db.DateTimeOffset
+  PromissoryNoteId       Int                      @id(map: "PK_PromissoryNotes")
+  ConfirmedAt            DateTime?                @db.DateTimeOffset
+  ConfirmationType       Int?
+  PromissoryNoteOwnerId  Int?
+  Balance                Decimal                  @db.Decimal(19, 4)
+  Source                 Int
+  CreditLineId           Int?
+  PromissoryNotePayments PromissoryNotePayments[]
+
+  @@index([PaymentId], map: "nci_wi_PromissoryNotes_3A23E3D11340066A01E9214A070A395A")
+  @@schema("OrderManagement")
+}
+
+model PromissoryNoteTransfers {
+  PaymentId                     Int       @id(map: "PK_PromissoryNoteTransfers")
+  DocumentUrl                   String
+  SignedDocumentUrl             String?
+  Status                        Int
+  StartedAt                     DateTime  @db.DateTimeOffset
+  SignedAt                      DateTime? @db.DateTimeOffset
+  DownloadedAt                  DateTime? @db.DateTimeOffset
+  ExternalTransactionId         String    @db.NVarChar(100)
+  ExternalDocumentId            String    @db.NVarChar(100)
+  ExternalBuyerSigningEntityId  String?   @db.NVarChar(100)
+  ExternalSellerSigningEntityId String?   @db.NVarChar(100)
+
+  @@schema("OrderManagement")
+}
+
+model PromotionApplications {
+  Id             Int        @id(map: "PK_PromotionApplication")
+  Amount         Decimal    @db.Decimal(19, 4)
+  ExpirationDate DateTime?  @db.DateTimeOffset
+  CreatedAt      DateTime   @db.DateTimeOffset
+  PromotionId    Int
+  UserId         Int
+  IsExpired      Boolean
+  Promotions     Promotions @relation(fields: [PromotionId], references: [Id], onUpdate: NoAction, map: "FK_PromotionApplication_Promotions_Id")
+
+  @@schema("OrderManagement")
+}
+
+model Promotions {
+  Id                    Int                     @id(map: "PK_Promotions")
+  Amount                Decimal                 @db.Decimal(19, 4)
+  StartAt               DateTime                @db.DateTimeOffset
+  EndAt                 DateTime?               @db.DateTimeOffset
+  CreatedAt             DateTime                @db.DateTimeOffset
+  Days                  Int
+  Stock                 Int
+  PromotionApplications PromotionApplications[]
+
+  @@schema("OrderManagement")
+}
+
+model Qrs {
+  PaymentId      Int       @id(map: "PK_Qrs")
+  Status         Int
+  ExternalId     String?   @db.NVarChar(255)
+  Image          String?   @db.NVarChar(4000)
+  RequestedAt    DateTime? @db.DateTimeOffset
+  PaidAt         DateTime? @db.DateTimeOffset
+  SenderBankCode String?   @db.NVarChar(255)
+  SenderName     String?   @db.NVarChar(255)
+  SenderAccount  String?   @db.NVarChar(255)
+  SenderDocument String?   @db.NVarChar(255)
+  Amount         Decimal?  @db.Decimal(19, 4)
+
+  @@schema("OrderManagement")
+}
+
+model ReceiptNotes {
+  OrderId Int    @id(map: "PK_ReceiptNotes")
+  Url     String
+  Orders  Orders @relation(fields: [OrderId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_ReceiptNotes_Orders_OrderId")
+
+  @@schema("OrderManagement")
+}
+
+model ReferralCodeApplications {
+  ReferralCodeId Int
+  UserId         Int
+  Status         Int
+  CreatedAt      DateTime      @db.DateTimeOffset
+  ReferralCodes  ReferralCodes @relation(fields: [ReferralCodeId], references: [Id], onUpdate: NoAction, map: "FK_ReferralCodeApplications_ReferralCodes_ReferralCodeId")
+
+  @@id([ReferralCodeId, UserId], map: "PK_ReferralCodeApplications")
+  @@schema("dbo")
+}
+
+model ReferralCodes {
+  Id                       Int                        @id(map: "PK_ReferralCodes")
+  Code                     String                     @db.NVarChar(255)
+  CreatedAt                DateTime                   @db.DateTimeOffset
+  ReferralCodeApplications ReferralCodeApplications[]
+
+  @@schema("dbo")
+}
+
+model RefreshTokens {
+  UserId          Int
+  Token           String      @db.NVarChar(255)
+  ExpiresAt       DateTime    @db.DateTimeOffset
+  RevokedAt       DateTime?   @db.DateTimeOffset
+  RemoteIpAddress String      @db.NVarChar(255)
+  AspNetUsers     AspNetUsers @relation(fields: [UserId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_RefreshTokens_AspNetUsers_Id")
+
+  @@id([UserId, Token], map: "PK_RefreshTokens")
+  @@schema("dbo")
+}
+
+model RestrictedStoreProductGroups {
+  Id                      Int                       @id(map: "PK_RestrictedStoreProductGroups")
+  Name                    String                    @db.NVarChar(255)
+  IsEnabled               Boolean
+  StoreId                 Int
+  CreatedAt               DateTime                  @db.DateTimeOffset
+  Factor                  Decimal                   @db.Decimal(19, 4)
+  RestrictedStoreProducts RestrictedStoreProducts[]
+
+  @@schema("OrderManagement")
+}
+
+model RestrictedStoreProducts {
+  RestrictedStoreProductGroupId Int
+  StoreProductId                Int
+  RestrictedStoreProductGroups  RestrictedStoreProductGroups @relation(fields: [RestrictedStoreProductGroupId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_RestrictedStoreProducts_RestrictedStoreProductGroup_RestrictedStoreProductGroupId")
+
+  @@id([RestrictedStoreProductGroupId, StoreProductId], map: "PK_RestrictedStoreProducts")
+  @@schema("OrderManagement")
+}
+
+model ReturnType {
+  ReturnTypeId     Int                @id(map: "PK__ReturnTy__A2DEAFF892BCCCB5") @default(autoincrement())
+  Name             String             @db.VarChar(80)
+  IsEnabled        Boolean
+  CreatedAt        DateTime
+  ModifiedAt       DateTime?
+  OrderReturnItems OrderReturnItems[]
+
+  @@schema("OrderManagement")
+}
+
+model RoutePoints {
+  RoutePointId Int     @id(map: "PK_RoutePoints") @default(autoincrement())
+  RouteId      Int
+  ZoneId       Int
+  Latitude     Decimal @db.Decimal(17, 14)
+  Longitude    Decimal @db.Decimal(17, 14)
+  Routes       Routes  @relation(fields: [ZoneId, RouteId], references: [ZoneId, RouteId], onDelete: Cascade, onUpdate: NoAction, map: "FK_RoutePoints_Routes_RouteId")
+
+  @@schema("OrderManagement")
+}
+
+model Routes {
+  RouteId        Int
+  ZoneId         Int
+  Name           String           @db.NVarChar(255)
+  Day            Int
+  RoutePoints    RoutePoints[]
+  Zones          Zones            @relation(fields: [ZoneId], references: [ZoneId], onDelete: Cascade, onUpdate: NoAction, map: "FK_Routes_Zones_ZoneId")
+  SalesmanRoutes SalesmanRoutes[]
+
+  @@id([ZoneId, RouteId], map: "PK_Routes")
+  @@schema("OrderManagement")
+}
+
+model Sales {
+  SaleId  String @id(map: "PK_Sales") @db.NVarChar(50)
+  OrderId Int
+  Orders  Orders @relation(fields: [OrderId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_Sales_Orders_OrderId")
+
+  @@schema("OrderManagement")
+}
+
+model SalesmanRouteDeliveryLocations {
+  SalesmanRouteId    Int
+  DeliveryLocationId Int
+  Latitude           Decimal        @db.Decimal(17, 14)
+  Longitude          Decimal        @db.Decimal(17, 14)
+  OrderId            Int?
+  Sequence           Int
+  VisitedAt          DateTime?      @db.DateTimeOffset
+  CanceledAt         DateTime?      @db.DateTimeOffset
+  Status             Int
+  Reason             String?
+  SalesmanRoutes     SalesmanRoutes @relation(fields: [SalesmanRouteId], references: [SalesmanRouteId], onDelete: Cascade, onUpdate: NoAction, map: "FK_SalesmanRouteDeliveryLocations_SalesmanRoutes_SalesmanRouteId")
+
+  @@id([SalesmanRouteId, DeliveryLocationId], map: "PK_SalesmanRouteDeliveryLocations")
+  @@schema("OrderManagement")
+}
+
+model SalesmanRoutes {
+  SalesmanRouteId                Int                              @id(map: "PK_SalesmanRoutes")
+  ZoneId                         Int
+  SalesmanId                     Int
+  RouteId                        Int
+  CreatedAt                      DateTime                         @db.DateTimeOffset
+  Status                         Int
+  StartedAt                      DateTime?                        @db.DateTimeOffset
+  CompletedAt                    DateTime?                        @db.DateTimeOffset
+  SalesmanRouteDeliveryLocations SalesmanRouteDeliveryLocations[]
+  Routes                         Routes                           @relation(fields: [ZoneId, RouteId], references: [ZoneId, RouteId], onDelete: Cascade, onUpdate: NoAction, map: "FK_SalesmanRoutes_Routes_ZoneId")
+
+  @@schema("OrderManagement")
+}
+
+model SalesmanStores {
+  SalesmanId Int
+  StoreId    Int
+  Salesmen   Salesmen @relation(fields: [SalesmanId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_SalesmanStores_Salesmen_Id")
+
+  @@id([SalesmanId, StoreId], map: "PK_SalesmanStores")
+  @@schema("dbo")
+}
+
+model Salesmen {
+  Id             Int              @id(map: "PK_Salesmen")
+  Status         Int
+  IsEnabled      Boolean
+  SalesmanStores SalesmanStores[]
+
+  @@schema("dbo")
+}
+
+model SavedCards {
+  Id             Int         @id(map: "PK_SavedCards")
+  UserId         Int
+  Token          String
+  FourDigits     String      @db.NVarChar(4)
+  CardType       String      @db.NVarChar(50)
+  ExpirationDate String      @db.NVarChar(10)
+  IsVisible      Boolean
+  IsDefault      Boolean
+  CreatedAt      DateTime    @db.DateTimeOffset
+  UpdatedAt      DateTime?   @db.DateTimeOffset
+  AspNetUsers    AspNetUsers @relation(fields: [UserId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_SavedCards_AspNetUsers")
+
+  @@index([UserId], map: "IX_SavedCards_UserId")
+  @@schema("OrderManagement")
+}
+
+model dbo_SchemaVersions {
+  Id         Int      @id(map: "PK_SchemaVersions_Id") @default(autoincrement())
+  ScriptName String   @db.NVarChar(255)
+  Applied    DateTime @db.DateTime
+
+  @@map("SchemaVersions")
+  @@schema("dbo")
+}
+
+model OrderManagement_SchemaVersions {
+  Id         Int      @id(map: "PK_SchemaVersions_Id") @default(autoincrement())
+  ScriptName String   @db.NVarChar(255)
+  Applied    DateTime @db.DateTime
+
+  @@map("SchemaVersions")
+  @@schema("OrderManagement")
+}
+
+model ScoreProviderCalls {
+  ScoreProviderCallId Int      @id(map: "PK_ScoreProviderCalls")
+  PaymentId           Int
+  Provider            String   @db.NVarChar(255)
+  CalledAt            DateTime @db.DateTimeOffset
+  Result              Int
+  CreditLineRequestId Int
+  DocumentUrl         String?  @db.NVarChar(500)
+  PdfUrl              String?  @db.NVarChar(500)
+  FirstName           String?  @db.NVarChar(500)
+  LastName            String?  @db.NVarChar(500)
+  DocumentNumber      String?  @db.NVarChar(20)
+  IsApproved          Boolean?
+  ScoreThreshold      Int?
+  Score               Int?
+  HasOverdueDebts     Boolean?
+  Code                String?  @db.NVarChar(25)
+
+  @@schema("OrderManagement")
+}
+
+model ShippingInfos {
+  OrderId              Int       @id(map: "PK_ShippingInfos")
+  TimeSlotId           Int?
+  Address              String
+  LocationInstructions String?   @db.NVarChar(2000)
+  ShippingInstructions String?   @db.NVarChar(2000)
+  Reference            String?   @db.NVarChar(2000)
+  StartDateTime        DateTime? @db.DateTimeOffset
+  EndDateTime          DateTime? @db.DateTimeOffset
+  Latitude             Decimal?  @db.Decimal(17, 14)
+  Longitude            Decimal?  @db.Decimal(17, 14)
+  DeliveryLocationId   Int?
+  Orders               Orders    @relation(fields: [OrderId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_ShippingInfos_Orders_Id")
+
+  @@index([TimeSlotId], map: "nci_wi_ShippingInfos_2F81B99DC03C23E96CBBA59169C67547")
+  @@index([StartDateTime], map: "nci_wi_ShippingInfos_E27DB882EC10D970C1714FB38CEAA62C")
+  @@schema("OrderManagement")
+}
+
+model ShippingPolicies {
+  ShippingPolicyId Int  @id(map: "PK_ShippingPolicies")
+  DeliveryCostId   Int?
+
+  @@schema("OrderManagement")
+}
+
+model ShopperAssignmentItems {
+  Id                  BigInt             @id(map: "PK_ShopperAssignmentItems") @default(autoincrement())
+  OrderItemId         BigInt?
+  ShopperAssignmentId Int
+  Quantity            Decimal            @db.Decimal(19, 4)
+  CreatedAt           DateTime           @db.DateTimeOffset
+  UpdatedAt           DateTime?          @db.DateTimeOffset
+  Unit                Int
+  Price               Decimal            @db.Decimal(19, 4)
+  StoreProductId      Int?
+  Name                String?            @db.NVarChar(255)
+  Status              Int?
+  RequestedQuantity   Decimal?           @db.Decimal(19, 4)
+  RequestedPrice      Decimal?           @db.Decimal(19, 4)
+  RequestedUnit       Int?
+  FreeQuantity        Decimal            @db.Decimal(19, 4)
+  Sku                 String?            @db.NVarChar(32)
+  ImageUrl            String?            @db.NVarChar(255)
+  StoreCode           String?            @db.NVarChar(255)
+  StoreId             Int?
+  ShopperAssignments  ShopperAssignments @relation(fields: [ShopperAssignmentId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_ShopperAssignmentItems_ShopperAssignments_Id")
+
+  @@index([OrderItemId], map: "nci_wi_ShopperAssignmentItems_6834226AABE5C31457F3D8242A4DF733")
+  @@index([ShopperAssignmentId], map: "nci_wi_ShopperAssignmentItems_D7814F41D6225409A51C264E1454D019")
+  @@schema("OrderManagement")
+}
+
+model ShopperAssignments {
+  Id                      Int                      @id(map: "PK_ShopperAssignments")
+  OrderId                 Int                      @unique(map: "ShopperAssignmentOrderIdIndex")
+  ShopperId               Int
+  PickingStartedAt        DateTime?                @db.DateTimeOffset
+  DrivingStartedAt        DateTime?                @db.DateTimeOffset
+  DrivingEndedAt          DateTime?                @db.DateTimeOffset
+  CanceledAt              DateTime?                @db.DateTimeOffset
+  CompletedAt             DateTime?                @db.DateTimeOffset
+  CreatedAt               DateTime                 @db.DateTimeOffset
+  BillingStartedAt        DateTime?                @db.DateTimeOffset
+  DrivingFee              Decimal                  @db.Decimal(19, 4)
+  PickingFee              Decimal                  @db.Decimal(19, 4)
+  Duration                Decimal                  @db.Decimal(19, 4)
+  Distance                Decimal                  @db.Decimal(19, 4)
+  PickingEndedAt          DateTime?                @db.DateTimeOffset
+  ManuallyCompletedReason String?
+  PickingCount            Int?
+  OrderModifications      OrderModifications[]
+  ShopperAssignmentItems  ShopperAssignmentItems[]
+  Orders                  Orders                   @relation(fields: [OrderId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_ShopperAssignments_Orders_Id")
+
+  @@index([CanceledAt, CompletedAt, ShopperId, DrivingEndedAt, DrivingStartedAt], map: "nci_wi_ShopperAssignments_02B04E6912FD654F00927336B32826AE")
+  @@index([OrderId, CompletedAt], map: "nci_wi_ShopperAssignments_C86CE19249B30E118D1197CD138EA099")
+  @@index([CanceledAt, CompletedAt, ShopperId], map: "nci_wi_ShopperAssignments_E4ABF9D934E3E70C014B3E005C6B230F")
+  @@index([ShopperId, CompletedAt], map: "nci_wi_ShopperAssignments_F5D75ECDE2519FD0877F48F922DE9E19")
+  @@index([CanceledAt], map: "nci_wi_ShopperAssignments_FDE6FEC8EBE2955389D83102E941E8E0")
+  @@schema("OrderManagement")
+}
+
+model ShopperAvailabilities {
+  Id        BigInt                   @id(map: "PK_ShopperAvailabilities") @default(autoincrement()) @unique
+  ShopperId Int
+  Type      Int
+  CreatedAt DateTime                 @db.DateTimeOffset
+  Shoppers  OrderManagement_Shoppers @relation(fields: [ShopperId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_ShopperAvailabilities_Shoppers_Id") @ignore
+
+  @@schema("OrderManagement")
+}
+
+model ShopperRatings {
+  OrderId  Int      @id(map: "PK_ShopperRatings")
+  ThumbsUp Boolean
+  RatedAt  DateTime @db.DateTimeOffset
+  Comments String?
+  Orders   Orders   @relation(fields: [OrderId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_ShopperRatings_Orders_Id")
+
+  @@schema("OrderManagement")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model OrderManagement_Shoppers {
+  Id                               Int @id
+  MaxNumberOfAssignmentsInParallel Int
+  IsAvailable                      Boolean
+  SearchByTrackingIdIsEnabled      Boolean
+  ShopperAvailabilities            ShopperAvailabilities[]
+
+  @@map("Shoppers")
+  @@ignore
+  @@schema("OrderManagement")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model dbo_Shoppers {
+  Id            Int @id
+  Status        Int
+  IsEnabled     Boolean
+  ShopperStores ShopperStores[]
+
+  @@map("Shoppers")
+  @@ignore
+  @@schema("dbo")
+}
+
+model ShopperStores {
+  ShopperId Int
+  StoreId   Int
+  Shoppers  dbo_Shoppers @relation(fields: [ShopperId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_ShopperStores_Shoppers_StoreAdminId") @ignore
+
+  @@id([ShopperId, StoreId], map: "PK_ShopperStores")
+  @@schema("dbo")
+}
+
+model ShoppingCartItemAttributeValues {
+  ShoppingCartItemId BigInt
+  AttributeValueId   Int
+  ShoppingCartItems  ShoppingCartItems @relation(fields: [ShoppingCartItemId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_ShoppingCartItemAttributeValues_ShoppingCartItems_ShoppingCartItemId")
+
+  @@id([ShoppingCartItemId, AttributeValueId], map: "PK_ShoppingCartItemAttributeValues")
+  @@schema("OrderManagement")
+}
+
+model ShoppingCartItems {
+  Id                              BigInt                            @id(map: "PK_ShoppingCartItems")
+  ConsumerId                      Int
+  StoreProductId                  Int
+  StoreId                         Int
+  Quantity                        Decimal                           @db.Decimal(19, 4)
+  Instructions                    String?                           @db.NVarChar(2000)
+  IsWholesalerStore               Boolean
+  Price                           Decimal                           @db.Decimal(19, 4)
+  PercentageDiscount              Decimal                           @db.Decimal(19, 4)
+  AddedAt                         DateTime?                         @db.DateTimeOffset
+  SalesmanId                      Int?
+  BasePrice                       Decimal                           @db.Decimal(19, 4)
+  Installments                    Int
+  ShoppingCartItemAttributeValues ShoppingCartItemAttributeValues[]
+
+  @@unique([ConsumerId, StoreProductId], map: "ShoppingCartItemsConsumerIdStoreProductIdIndex")
+  @@schema("OrderManagement")
+}
+
+model StoreAccess {
+  Id          Int       @id(map: "PK__StoreAcc__3214EC0748AC7548") @default(autoincrement())
+  Name        String    @db.VarChar(256)
+  ImageUrl    String    @db.VarChar(1024)
+  Description String    @db.VarChar(1024)
+  IsEnabled   Boolean
+  StoreId     Int
+  ConsumerId  Int
+  Consumers   Consumers @relation(fields: [ConsumerId], references: [Id], onUpdate: NoAction, map: "FK_StoreAccess_Consumer")
+
+  @@index([ConsumerId], map: "IX_StoreAccess_ConsumerId")
+  @@index([StoreId], map: "IX_StoreAccess_StoreId")
+  @@schema("dbo")
+}
+
+model StoreAdmins {
+  Id               Int                @id(map: "PK_StoreAdmins")
+  IsEnabled        Boolean
+  StoreAdminStores StoreAdminStores[]
+
+  @@schema("dbo")
+}
+
+model StoreAdminStores {
+  StoreAdminId Int
+  StoreId      Int
+  StoreAdmins  StoreAdmins @relation(fields: [StoreAdminId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_StoreAdminStores_StoreAdmins_StoreAdminId")
+
+  @@id([StoreAdminId, StoreId], map: "PK_StoreAdminStores")
+  @@schema("dbo")
+}
+
+model StoreBusinessCategories {
+  StoreId            Int
+  BusinessCategoryId Int
+
+  @@id([StoreId, BusinessCategoryId], map: "PK_StoreBusinessCategories")
+  @@schema("OrderManagement")
+}
+
+model StoreConsumers {
+  ConsumerId Int
+  StoreId    Int
+
+  @@id([ConsumerId, StoreId], map: "PK_StoreConsumers")
+  @@schema("OrderManagement")
+}
+
+model StoreContact {
+  Id          Int     @id(map: "PK__StoreCon__3214EC079703F9EB") @default(autoincrement())
+  StoreId     Int
+  Name        String  @db.VarChar(256)
+  Email       String  @db.VarChar(256)
+  PhoneNumber String  @db.VarChar(50)
+  IsEnabled   Boolean
+  Stores      Stores  @relation(fields: [StoreId], references: [Id], onUpdate: NoAction, map: "FK_StoreContact_Stores")
+
+  @@schema("OrderManagement")
+}
+
+model StoreCoverageAreas {
+  StoreCoverageAreaId Int                   @id(map: "PK_StoreCoverageAreas")
+  StoreId             Int
+  Stores              Stores                @relation(fields: [StoreId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_StoreCoverageAreas_Stores_Id")
+  StoreCoveragePoints StoreCoveragePoints[]
+
+  @@schema("OrderManagement")
+}
+
+model StoreCoveragePoints {
+  StoreCoveragePointId Int                @id(map: "PK_StoreCoveragePoints") @default(autoincrement())
+  StoreCoverageAreaId  Int
+  Latitude             Decimal            @db.Decimal(17, 14)
+  Longitude            Decimal            @db.Decimal(17, 14)
+  StoreCoverageAreas   StoreCoverageAreas @relation(fields: [StoreCoverageAreaId], references: [StoreCoverageAreaId], onDelete: Cascade, onUpdate: NoAction, map: "FK_StoreCoveragePoints_StoreCoverageAreas_StoreCoveragePointId")
+
+  @@schema("OrderManagement")
+}
+
+model StorePaymentMethods {
+  Id                            Int     @id(map: "PK_StorePaymentMethod")
+  PaymentMethod                 Int
+  StoreId                       Int
+  IsEnabled                     Boolean
+  Commission                    Decimal @db.Decimal(19, 4)
+  MaxNumberOfPaymentsInProgress Int?
+
+  @@schema("OrderManagement")
+}
+
+model StoreProductBonuses {
+  StoreProductId Int     @id(map: "PK_StoreProductBonuses")
+  Quantity       Decimal @db.Decimal(19, 4)
+  Bonus          Decimal @db.Decimal(19, 4)
+  IsEnabled      Boolean
+
+  @@schema("OrderManagement")
+}
+
+model StoreProducts {
+  Id                    Int     @id(map: "PK_StoreProducts")
+  LimitQuantityPurchase Decimal @db.Decimal(19, 4)
+  ExternalCrmId         String? @db.NVarChar(100)
+
+  @@schema("OrderManagement")
+}
+
+model Stores {
+  Id                               Int                  @id(map: "PK_Stores")
+  Name                             String               @db.NVarChar(255)
+  ImageUrl                         String?              @db.NVarChar(255)
+  Type                             Int
+  MinimalAmountToDispatch          Decimal?             @db.Decimal(9, 6)
+  ConsumerCoverage                 Decimal?             @db.Decimal(9, 6)
+  Latitude                         Decimal?             @db.Decimal(17, 14)
+  Longitude                        Decimal?             @db.Decimal(17, 14)
+  ShopperAssignmentCoverage        Decimal?             @db.Decimal(9, 6)
+  IsEnabledPickingFee              Boolean
+  IsEnabledDrivingFee              Boolean
+  BasePickingRate                  Decimal              @db.Decimal(19, 4)
+  BaseDrivingRate                  Decimal              @db.Decimal(19, 4)
+  MinuteRate                       Decimal              @db.Decimal(19, 4)
+  KilometerRate                    Decimal              @db.Decimal(19, 4)
+  ProductRate                      Decimal              @db.Decimal(19, 4)
+  PickingFreeThreshold             Decimal?             @db.Decimal(19, 4)
+  DrivingFreeThreshold             Decimal?             @db.Decimal(19, 4)
+  IsWholeSaler                     Boolean
+  MaximunDrivingFee                Decimal?             @db.Decimal(19, 4)
+  IsEnabledBillingInfoModification Boolean
+  MinimunDrivingFee                Decimal              @db.Decimal(19, 4)
+  PercentagePickingRate            Decimal?             @db.Decimal(19, 4)
+  BusinessType                     Int
+  FormId                           String?              @db.NVarChar(1024)
+  Group                            String?              @db.NVarChar(255)
+  ChangesAreAllowed                Boolean
+  MaxNumberOfItems                 Int?
+  IsMessagingEnabled               Boolean
+  IsPrivate                        Boolean
+  ConfirmTemplate                  String               @db.NVarChar(50)
+  CompleteTemplate                 String               @db.NVarChar(50)
+  CancelTemplate                   String               @db.NVarChar(50)
+  DefaultInstallments              Int
+  DefaultInitialPercentage         Decimal              @db.Decimal(19, 4)
+  DefaultStoreProductName          String?              @db.NVarChar(255)
+  DaysToConsiderOverdueInstallment Int
+  DefaultDiscountRate              Decimal              @db.Decimal(19, 4)
+  DrivingFlatRateMinValue          Decimal?             @db.Decimal(19, 4)
+  DrivingFlatRateMaxValue          Decimal?             @db.Decimal(19, 4)
+  DrivingFlatRate                  Decimal?             @db.Decimal(19, 4)
+  OrderIndex                       Int?
+  StoreContact                     StoreContact[]
+  StoreCoverageAreas               StoreCoverageAreas[]
+  TelegramStoreChats               TelegramStoreChats[]
+
+  @@schema("OrderManagement")
+}
+
+model StoreTimeSlots {
+  StoreId    Int
+  TimeSlotId Int
+  Quota      Int
+  DayOfWeek  Int
+  StartAt    DateTime  @db.Time
+  EndAt      DateTime  @db.Time
+  IsEnabled  Boolean
+  DeletedAt  DateTime? @db.DateTimeOffset
+
+  @@id([StoreId, TimeSlotId], map: "PK_StoreTimeSlots")
+  @@schema("OrderManagement")
+}
+
+model sysdiagrams {
+  name         String @db.NVarChar(128)
+  principal_id Int
+  diagram_id   Int    @id(map: "PK__sysdiagr__C2B05B61ECC4AC09") @default(autoincrement())
+  version      Int?
+  definition   Bytes?
+
+  @@unique([principal_id, name], map: "UK_principal_name")
+  @@schema("dbo")
+}
+
+model TelegramStoreChats {
+  Id        Int     @id(map: "PK__Telegram__3214EC07389E0A72") @default(autoincrement())
+  StoreId   Int
+  ChatId    String  @db.VarChar(50)
+  IsEnabled Boolean
+  Stores    Stores  @relation(fields: [StoreId], references: [Id], onUpdate: NoAction, map: "FK_TelegramStoreChats_Stores")
+
+  @@schema("OrderManagement")
+}
+
+model UnitOfMeasures {
+  Id     Int     @id(map: "PK_UnitOfMeasures")
+  Name   String  @db.NVarChar(255)
+  Symbol String? @db.NVarChar(255)
+
+  @@schema("OrderManagement")
+}
+
+model VendorAdmins {
+  VendorId      Int
+  VendorAdminId Int
+
+  @@id([VendorId, VendorAdminId], map: "PK_VendorAdmins")
+  @@schema("dbo")
+}
+
+model VendorRequests {
+  VendorRequestId Int       @id(map: "PK_VendorRequests")
+  BusinessName    String    @db.NVarChar(255)
+  ContactPhone    String    @db.NVarChar(255)
+  ContactName     String    @db.NVarChar(255)
+  ContactEmail    String    @db.NVarChar(255)
+  Status          Int
+  CreatedAt       DateTime  @db.DateTimeOffset
+  RejectedAt      DateTime? @db.DateTimeOffset
+  ApprovedAt      DateTime? @db.DateTimeOffset
+
+  @@schema("OrderManagement")
+}
+
+model Vendors {
+  VendorId     Int     @id(map: "PK_Vendors")
+  StoreId      Int?
+  BusinessName String  @db.NVarChar(255)
+  Description  String?
+  ContactPhone String  @db.NVarChar(255)
+  ContactName  String  @db.NVarChar(255)
+  ContactEmail String  @db.NVarChar(255)
+  ImageUrl     String? @db.NVarChar(255)
+  IsEnabled    Boolean
+  Docks        Docks[]
+
+  @@schema("OrderManagement")
+}
+
+model Versions {
+  Id          Int     @id(map: "PK_Versions") @default(autoincrement())
+  Version     String  @db.NVarChar(255)
+  ForceUpdate Boolean
+  Environment String  @db.NVarChar(255)
+  Client      String? @db.NVarChar(255)
+  Platform    String? @db.NVarChar(255)
+
+  @@schema("dbo")
+}
+
+model VolumeDiscountIntervals {
+  VolumeDiscountId Int
+  Id               Int
+  Discount         Decimal         @db.Decimal(19, 4)
+  StartAt          Decimal         @db.Decimal(19, 4)
+  EndAt            Decimal         @db.Decimal(19, 4)
+  VolumeDiscounts  VolumeDiscounts @relation(fields: [VolumeDiscountId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_VolumeDiscountIntervals_VolumeDiscounts_VolumeDiscountId")
+
+  @@id([VolumeDiscountId, Id], map: "PK_VolumeDiscountIntervals")
+  @@schema("OrderManagement")
+}
+
+model VolumeDiscounts {
+  Id                          Int                           @id(map: "PK_VolumeDiscounts")
+  Name                        String                        @db.NVarChar(255)
+  IsEnabled                   Boolean
+  StoreId                     Int
+  VolumeDiscountIntervals     VolumeDiscountIntervals[]
+  VolumeDiscountStoreProducts VolumeDiscountStoreProducts[]
+
+  @@schema("OrderManagement")
+}
+
+model VolumeDiscountStoreProducts {
+  VolumeDiscountId Int
+  StoreProductId   Int
+  VolumeDiscounts  VolumeDiscounts @relation(fields: [VolumeDiscountId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_VolumeDiscountStoreProducts_VolumeDiscounts_VolumeDiscountId")
+
+  @@id([VolumeDiscountId, StoreProductId], map: "PK_VolumeDiscountStoreProducts")
+  @@schema("OrderManagement")
+}
+
+model ZonePoints {
+  ZonePointId Int     @id(map: "PK_ZonePoints") @default(autoincrement())
+  ZoneId      Int
+  Latitude    Decimal @db.Decimal(17, 14)
+  Longitude   Decimal @db.Decimal(17, 14)
+  Zones       Zones   @relation(fields: [ZoneId], references: [ZoneId], onDelete: Cascade, onUpdate: NoAction, map: "FK_ZonePoints_Zones_ZoneId")
+
+  @@schema("OrderManagement")
+}
+
+model Zones {
+  ZoneId     Int          @id(map: "PK_Zones")
+  Name       String       @db.NVarChar(255)
+  SalesmanId Int
+  Routes     Routes[]
+  ZonePoints ZonePoints[]
+
+  @@schema("OrderManagement")
+}

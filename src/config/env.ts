@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { z } from 'zod';
 
 const envSchema = z.object({
-  DATABASE_URL: z.string().min(1),
+  DATABASE_URL_DB1: z.string().min(1),
   RABBITMQ_URL: z.string().min(1),
   RABBITMQ_QUEUE: z.string().min(1),
   RABBITMQ_USER: z.string().min(1),
