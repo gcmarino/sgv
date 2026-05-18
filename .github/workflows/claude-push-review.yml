@@ -1,0 +1,87 @@
+name: Claude Push Review
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  claude-push-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Get commit diff
+        id: diff
+        run: |
+          DIFF=$(git diff HEAD~1 HEAD -- '*.ts' '*.js' '*.json' '*.prisma' '*.yml' '*.yaml' 2>/dev/null || echo "")
+          if [ -z "$DIFF" ]; then
+            echo "empty=true" >> $GITHUB_OUTPUT
+          else
+            echo "empty=false" >> $GITHUB_OUTPUT
+            {
+              echo "content<<DIFF_EOF"
+              echo "$DIFF"
+              echo "DIFF_EOF"
+            } >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run Claude Push Review
+        if: steps.diff.outputs.empty == 'false'
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          allowed_tools: 'Bash'
+          prompt: |
+            You are reviewing a direct push to the `main` branch of this repository.
+
+            Your job: analyze the following git diff and identify real issues — bugs, potential runtime errors, security vulnerabilities, performance problems, or clear improvements. Skip trivial style issues.
+
+            After your analysis, create a GitHub issue using the `gh` CLI with this exact command structure:
+            ```
+            gh issue create \
+              --title "Claude Review: <short summary of main finding> (${{ github.sha }})" \
+              --body "<your full markdown review here>" \
+              --label "ai-review"
+            ```
+
+            If the label `ai-review` does not exist yet, create it first:
+            ```
+            gh label create "ai-review" --color "0075ca" --description "Automated Claude code review" || true
+            ```
+
+            Issue body format (markdown):
+            ## Push Review — `${{ github.sha }}`
+
+            **Author:** ${{ github.actor }}
+            **Branch:** main
+            **Timestamp:** ${{ github.event.head_commit.timestamp }}
+
+            ---
+
+            ### Findings
+            <list findings with severity: 🔴 Bug / 🟡 Warning / 🔵 Suggestion>
+
+            ### Recommendations
+            <actionable next steps>
+
+            ---
+            _Generated automatically on push to main_
+
+            ---
+
+            Here is the diff to review:
+
+            ```diff
+            ${{ steps.diff.outputs.content }}
+            ```
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
